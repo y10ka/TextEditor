@@ -29,7 +29,7 @@ class App(customtkinter.CTk):
 
     def __init__(self):
         super().__init__()
-
+        
         self.title("Text Editor")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}+10+10")
         self.resizable(0, 0)
@@ -42,8 +42,11 @@ class App(customtkinter.CTk):
                                           text_color="Black",
                                           font=("Verdana", 20),
                                           wrap="none")
-        self.text_field.configure(text_font=("Consolas", 14))
+        self.text_field.configure(text_font=("Consolas", 14), insertbackground='black')
         self.text_field.place(x=120, y=20)
+
+        self.font = "Consolas"
+        self.font_size_int = 14
 
         self.scrollbar = customtkinter.CTkScrollbar(self, command=self.text_field.yview)
         self.scrollbar.configure(height=650)
@@ -61,7 +64,7 @@ class App(customtkinter.CTk):
                                                    text="Open File",
                                                    width=100,
                                                    height=40,
-                                                   border_width=2,
+                                                   border_width=0,
                                                    corner_radius=7,
                                                    command=self.open_file)
         self.open_button.place(x=10, y=100)
@@ -69,18 +72,33 @@ class App(customtkinter.CTk):
                                                    text="Save File",
                                                    width=100,
                                                    height=40,
-                                                   border_width=2,
+                                                   border_width=0,
                                                    corner_radius=7,
                                                    command=self.save_file)
         self.save_button.place(x=10, y=150)
 
-        self.font_box = customtkinter.CTkOptionMenu(master=self,
-                                                    values=["Consolas",
-                                                            "Times",
-                                                            "Calibri"],
-                                                    command=self.optionmenu_callback)
-        self.font_box.configure(width=100, height=20)
-        self.font_box.place(x=10, y=250)
+        self.font_choose = customtkinter.CTkOptionMenu(master=self,
+                                                       values=["Consolas",
+                                                               "Times",
+                                                               "Calibri"],
+                                                       command=self.font_style)
+        self.font_choose.configure(width=100, height=20)
+        self.font_choose.place(x=10, y=400)
+
+        self.font_size = customtkinter.CTkEntry(master=self,
+                                                placeholder_text="Size",
+                                                width=60,
+                                                height=30)
+
+        self.font_size.place(x=10, y=360)
+
+        self.font_apply = customtkinter.CTkButton(master=self,
+                                                  text="OK",
+                                                  width=30,
+                                                  height=30,
+                                                  corner_radius=7,
+                                                  command=self.apply_font)
+        self.font_apply.place(x=80, y=360)
 
         self.search = customtkinter.CTkEntry(master=self,
                                              placeholder_text="Search",
@@ -141,6 +159,21 @@ class App(customtkinter.CTk):
         self.bind('<Control-o>', self.open_file)
         self.bind('<Control-Alt-F4>', self.destroy)
 
+    def font_style(self, s=None):
+        font_in = str(self.font_choose.get())
+        if len(font_in) > 0:
+            self.font = str(font_in)
+        self.text_field.configure(text_font=(str(self.font), int(self.font_size_int)))
+
+    def apply_font(self):
+        try:
+            size_in = int(self.font_size.get())
+            if size_in and not isinstance(size_in, str):
+                self.font_size_int = int(size_in)
+        except Exception:
+            raise TypeError
+        self.text_field.configure(text_font=(str(self.font), int(self.font_size_int)))
+
     def search_text(self):
         self.text_field.tag_remove('found', '1.0', tkinter.END)
         ser = self.search.get()
@@ -179,7 +212,7 @@ class App(customtkinter.CTk):
 
     def open_file(self, o=None):
         filepath = askopenfilename(
-            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+            filetypes=[("Text Files", "*.txt .cpp .h .py"), ("All Files", "*.*")]
         )
         if not filepath:
             return
@@ -192,7 +225,7 @@ class App(customtkinter.CTk):
     def save_file(self, s=None):
         filepath = asksaveasfilename(
             defaultextension="txt",
-            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")],
+            filetypes=[("Text Files", "*.txt *.txt .cpp .h .py"), ("All Files", "*.*")],
         )
         if not filepath:
             return
