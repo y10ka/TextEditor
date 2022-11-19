@@ -8,6 +8,20 @@ customtkinter.set_appearance_mode("Dark")
 customtkinter.set_default_color_theme("blue")
 
 
+class AdvancedTextBox(customtkinter.CTkTextbox):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        return self.textbox.delete(*args, **kwargs)
+
+    def get(self, index1, index2):
+        return self.textbox.get(index1, index2)
+
+    def search(self, *args, **kwargs):
+        return self.textbox.search(*args, **kwargs)
+
+
 class App(customtkinter.CTk):
 
     WIDTH = 1200
@@ -21,15 +35,13 @@ class App(customtkinter.CTk):
         self.resizable(0, 0)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        self.text_field = customtkinter.CTkTextbox(master=self,
-                                                   width=800,
-                                                   height=650,
-                                                   corner_radius=15,
-                                                   border_width=5,
-                                                   fg_color="#E6FFFF",
-                                                   text_color="Black",
-                                                   font=("Verdana", 20),
-                                                   wrap="none")
+        self.text_field = AdvancedTextBox(master=self, width=800, height=650,
+                                          corner_radius=15,
+                                          border_width=5,
+                                          fg_color="#E6FFFF",
+                                          text_color="Black",
+                                          font=("Verdana", 20),
+                                          wrap="none")
         self.text_field.configure(text_font=("Consolas", 14))
         self.text_field.place(x=120, y=20)
 
